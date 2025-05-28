@@ -1,0 +1,285 @@
+{%- comment -%}
+  Cart Drawer
+  Slides in from right when cart icon is clicked
+{%- endcomment -%}
+
+<div id="cartDrawer" class="cart-drawer fixed top-0 right-0 h-full w-full md:w-96 bg-white shadow-xl transform translate-x-full transition-transform duration-300 z-50">
+  <div class="flex flex-col h-full">
+    <!-- Cart Header -->
+    <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+      <h2 class="text-lg font-medium">Your Cart (<span class="js-cart-count">{{ cart.item_count }}</span>)</h2>
+      <button
+        type="button"
+        aria-label="Close cart"
+        class="p-2 hover:bg-gray-100 rounded-full js-cart-close"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+      <!-- Cart Items -->
+    <div class="flex-grow overflow-y-auto py-4">
+      {% if cart.item_count > 0 %}
+        <div class="cart__items js-cart-items space-y-4 px-4 js-filled-cart">
+          {% render 'cart-drawer-items' %}
+        </div>
+            <!-- Cart Empty State -->
+      {% else %}
+        <div class="cart__empty text-center py-12 px-4 js-empty-cart">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          <h3 class="text-lg font-medium mb-2">Your cart is empty</h3>
+          <p class="text-gray-500 mb-4">Looks like you haven't added anything to your cart yet.</p>
+          <a href="/collections/all" class="inline-block bg-primary hover:bg-primary-dark text-white text-sm font-medium px-6 py-2 rounded-lg transition-colors">
+            Start Shopping
+          </a>
+        </div>
+      {% endif %}
+    </div>
+    
+    <!-- Cart Footer -->
+    {% if cart.item_count > 0 %}
+      <div class="cart__footer bg-gray-50 p-4">        <!-- Subtotal -->
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-gray-600">Subtotal</span>
+          <span class="text-lg font-semibold js-cart-subtotal">{{ cart.total_price | money }}</span>
+        </div>
+        
+        <!-- Taxes and Shipping Note -->
+        <p class="text-xs text-gray-500 mb-4">Taxes and shipping calculated at checkout</p>
+          <!-- Checkout Button -->
+        <a href="/checkout" class="cart__checkout-btn block w-full bg-primary hover:bg-primary-dark text-white text-center font-medium py-3 rounded-lg transition-colors mb-2">
+          Checkout
+        </a>
+        
+        <!-- Continue Shopping -->
+        <button
+          type="button"
+          class="block w-full text-center text-sm text-gray-600 hover:text-primary js-cart-close"
+        >
+          Continue Shopping
+        </button>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Overlay for cart drawer -->
+<div 
+  id="cartOverlay" 
+  class="cart-drawer__overlay fixed inset-0 bg-black opacity-50 z-40 hidden"
+></div>
+
+<script>  document.addEventListener('DOMContentLoaded', function() {
+    // Show/hide the overlay when the cart drawer opens/closes
+    const cartDrawer = document.getElementById('cartDrawer');
+    const cartOverlay = document.getElementById('cartOverlay');
+    
+    // Function to show cart drawer
+    window.showCart = function() {
+      cartDrawer.classList.remove('translate-x-full');
+      cartOverlay.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+    };
+    
+    // Function to hide cart drawer
+    window.hideCart = function() {
+      cartDrawer.classList.add('translate-x-full');
+      cartOverlay.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    };
+    
+    // Helper function to format money values
+    window.formatMoney = function(cents, format) {
+      if (typeof cents === 'string') {
+        cents = cents.replace('.', '');
+      }
+      
+      const value = '';
+      const placeholderRegex = /\{\{\s*(\w+)\s*\}\}/;
+      const moneyFormat = format || "{{ shop.money_format }}";
+      
+      function formatWithDelimiters(number, precision, thousands, decimal) {
+        thousands = thousands || ',';
+        decimal = decimal || '.';
+        
+        if (isNaN(number) || number === null) {
+          return 0;
+        }
+        
+        number = (number / 100.0).toFixed(precision);
+        
+        const parts = number.split('.');
+        const dollarsAmount = parts[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1' + thousands);
+        const centsAmount = parts[1] ? (decimal + parts[1]) : '';
+        
+        return dollarsAmount + centsAmount;
+      }
+      
+      switch(moneyFormat.match(placeholderRegex)[1]) {
+        case 'amount':
+          value = formatWithDelimiters(cents, 2);
+          break;
+        case 'amount_no_decimals':
+          value = formatWithDelimiters(cents, 0);
+          break;
+        case 'amount_with_comma_separator':
+          value = formatWithDelimiters(cents, 2, '.', ',');
+          break;
+        case 'amount_no_decimals_with_comma_separator':
+          value = formatWithDelimiters(cents, 0, '.', ',');
+          break;
+      }
+      
+      return moneyFormat.replace(placeholderRegex, value);
+    };
+      // Setup all cart event listeners
+    setupCartEventListeners();
+    
+    // Function to set up all cart event listeners
+    function setupCartEventListeners() {
+      // Quantity buttons functionality
+      const quantityButtons = document.querySelectorAll('.cart-qty-btn');
+      quantityButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const line = parseInt(this.dataset.line);
+          const action = this.dataset.action;
+          const quantityInput = this.parentNode.querySelector('input');
+          let quantity = parseInt(quantityInput.value);
+          
+          if (action === 'increase') {
+            quantity += 1;
+          } else if (action === 'decrease' && quantity > 1) {
+            quantity -= 1;
+          }
+          // Update the cart using Shopify Ajax API
+        const formData = {
+          'line': line,
+          'quantity': quantity
+        };
+        
+        fetch('/cart/change.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        })
+        .then(response => response.json())        .then(data => {
+          // Update cart count
+          const cartCountElements = document.querySelectorAll('.js-cart-count');
+          cartCountElements.forEach(element => {
+            element.textContent = data.item_count;
+            element.classList.toggle('hidden', data.item_count === 0);
+          });
+          
+          // Update cart subtotal
+          const subtotalElement = document.querySelector('.js-cart-subtotal');
+          if (subtotalElement) {
+            subtotalElement.textContent = formatMoney(data.total_price);
+          }
+          
+          // Show/hide empty state
+          const emptyCartElement = document.querySelector('.js-empty-cart');
+          const filledCartElement = document.querySelector('.js-filled-cart');
+          if (data.item_count === 0) {
+            emptyCartElement.classList.remove('hidden');
+            filledCartElement.classList.add('hidden');
+          } else {
+            emptyCartElement.classList.add('hidden');
+            filledCartElement.classList.remove('hidden');
+          }
+          
+          // Refresh cart items via AJAX
+          fetch('/?view=cart-drawer', { credentials: 'same-origin' })
+            .then(response => response.text())
+            .then(html => {
+              const cartItemsContainer = document.querySelector('.js-cart-items');
+              if (cartItemsContainer) {
+                cartItemsContainer.innerHTML = html;
+                // Re-attach event listeners to the new cart items
+                setupCartEventListeners();
+              }
+            });
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      });
+    });
+    
+    // Remove item buttons functionality
+    const removeButtons = document.querySelectorAll('.cart__remove');
+    removeButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const line = parseInt(this.dataset.line);
+        
+        // Update the cart using Shopify Ajax API to set quantity to 0
+        fetch('/cart/change.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            'line': line,
+            'quantity': 0
+          })
+        })
+        .then(response => response.json())        .then(data => {
+          // Update cart count
+          const cartCountElements = document.querySelectorAll('.js-cart-count');
+          cartCountElements.forEach(element => {
+            element.textContent = data.item_count;
+            element.classList.toggle('hidden', data.item_count === 0);
+          });
+          
+          // Update cart subtotal
+          const subtotalElement = document.querySelector('.js-cart-subtotal');
+          if (subtotalElement) {
+            subtotalElement.textContent = formatMoney(data.total_price);
+          }
+          
+          // Show/hide empty state
+          const emptyCartElement = document.querySelector('.js-empty-cart');
+          const filledCartElement = document.querySelector('.js-filled-cart');
+          if (data.item_count === 0) {
+            emptyCartElement.classList.remove('hidden');
+            filledCartElement.classList.add('hidden');
+          } else {
+            emptyCartElement.classList.add('hidden');
+            filledCartElement.classList.remove('hidden');
+          }
+          
+          // Refresh cart items via AJAX
+          fetch('/?view=cart-drawer', { credentials: 'same-origin' })
+            .then(response => response.text())
+            .then(html => {
+              const cartItemsContainer = document.querySelector('.js-cart-items');
+              if (cartItemsContainer) {
+                cartItemsContainer.innerHTML = html;
+                // Re-attach event listeners to the new cart items
+                setupCartEventListeners();
+              }
+            });
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Cart Drawer",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Cart Drawer"
+    }
+  ]
+}
+{% endschema %}

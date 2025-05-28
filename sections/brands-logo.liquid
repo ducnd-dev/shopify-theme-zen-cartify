@@ -1,0 +1,110 @@
+{%- comment -%}
+  Brands Logo Section
+  Display partner or featured brand logos
+{%- endcomment -%}
+
+<section class="brands-logo py-12">
+  <div class="container mx-auto px-4">
+    {% if section.settings.title != blank %}
+      <header class="text-center mb-8">
+        <h2 class="text-xl md:text-2xl font-medium text-gray-700">{{ section.settings.title }}</h2>
+      </header>
+    {% endif %}
+    
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 items-center justify-items-center">
+      {% for block in section.blocks %}
+        {% if block.type == 'logo' %}
+          <div class="brand-logo max-w-[120px] md:max-w-[150px] text-center">
+            {% if block.settings.link != blank %}
+              <a href="{{ block.settings.link }}" class="block" target="{{ block.settings.open_new_tab | default: false | replace: true, '_blank' | replace: false, '_self' }}" aria-label="{{ block.settings.name | escape }}">
+            {% endif %}
+            
+            {% if block.settings.logo != blank %}
+              <img
+                src="{{ block.settings.logo | image_url: width: 150 }}"
+                alt="{{ block.settings.name | escape }}"
+                class="max-h-16 w-auto mx-auto opacity-80 hover:opacity-100 transition-opacity"
+                width="150"
+                loading="lazy"
+              >
+            {% else %}
+              <div class="h-16 flex items-center justify-center">
+                <span class="text-gray-500 font-medium">{{ block.settings.name }}</span>
+              </div>
+            {% endif %}
+            
+            {% if block.settings.link != blank %}
+              </a>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Brand Logos",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Thương Hiệu Đối Tác"
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Brand Logo",
+      "type": "logo",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Brand Name",
+          "default": "Brand Name"
+        },
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Logo Image"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Brand Link"
+        },
+        {
+          "type": "checkbox",
+          "id": "open_new_tab",
+          "label": "Open in new tab",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Brand Logos",
+      "blocks": [
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

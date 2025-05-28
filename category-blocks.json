@@ -1,0 +1,46 @@
+[
+  {
+    "type": "category_card",
+    "settings": {
+      "title": "Thời Trang Nam",
+      "image": "Shop.png",
+      "link": "/collections/mens",
+      "collection": "mens",
+      "show_count": true,
+      "custom_count": "Trên 50 sản phẩm"
+    }
+  },
+  {
+    "type": "category_card",
+    "settings": {
+      "title": "Thời Trang Nữ",
+      "image": "Shop.png",
+      "link": "/collections/womens",
+      "collection": "womens",
+      "show_count": true,
+      "custom_count": "Trên 70 sản phẩm"
+    }
+  },
+  {
+    "type": "category_card",
+    "settings": {
+      "title": "Phụ Kiện",
+      "image": "Shop.png",
+      "link": "/collections/accessories",
+      "collection": "accessories",
+      "show_count": true,
+      "custom_count": "Trên 30 sản phẩm"
+    }
+  },
+  {
+    "type": "category_card",
+    "settings": {
+      "title": "Sản Phẩm Giảm Giá",
+      "image": "Shop.png",
+      "link": "/collections/sale",
+      "collection": "sale",
+      "show_count": true,
+      "custom_count": "Từ 20%"
+    }
+  }
+]

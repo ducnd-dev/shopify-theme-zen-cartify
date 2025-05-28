@@ -1,0 +1,186 @@
+{%- comment -%}
+  Testimonials Section
+  Customer reviews and testimonials
+{%- endcomment -%}
+
+<section class="testimonials py-12 {% if section.settings.background_style == 'light' %}bg-gray-50{% elsif section.settings.background_style == 'dark' %}bg-gray-900 text-white{% else %}bg-background{% endif %}">
+  <div class="container mx-auto px-4">
+    <header class="text-center mb-10">
+      <h2 class="text-2xl md:text-3xl font-bold mb-3 {% if section.settings.background_style == 'dark' %}text-white{% endif %}">{{ section.settings.title }}</h2>
+      
+      {% if section.settings.subtitle != blank %}
+        <p class="{% if section.settings.background_style == 'dark' %}text-gray-300{% else %}text-gray-600{% endif %} max-w-xl mx-auto">
+          {{ section.settings.subtitle }}
+        </p>
+      {% endif %}
+    </header>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for block in section.blocks %}
+        {% if block.type == 'testimonial' %}
+          <div class="testimonial-card p-6 rounded-lg {% if section.settings.background_style == 'dark' %}bg-gray-800{% else %}bg-white{% endif %} shadow-lg">
+            <div class="testimonial-card__rating flex items-center mb-4">
+              {% assign rating = block.settings.rating | default: 5 %}
+              {% for i in (1..5) %}
+                {% if i <= rating %}
+                  <svg class="w-5 h-5 {% if section.settings.background_style == 'dark' %}text-yellow-400{% else %}text-yellow-500{% endif %}" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                  </svg>
+                {% else %}
+                  <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                  </svg>
+                {% endif %}
+              {% endfor %}
+            </div>
+            
+            <blockquote class="testimonial-card__quote {% if section.settings.background_style == 'dark' %}text-white{% else %}text-gray-700{% endif %} mb-4">
+              {{ block.settings.testimonial_text }}
+            </blockquote>
+            
+            <div class="testimonial-card__author flex items-center">
+              {% if block.settings.author_image != blank %}
+                <div class="testimonial-card__author-image mr-3">
+                  <img 
+                    src="{{ block.settings.author_image | image_url: width: 60 }}" 
+                    alt="{{ block.settings.author_name | escape }}"
+                    class="w-10 h-10 rounded-full object-cover"
+                    width="40"
+                    height="40"
+                    loading="lazy"
+                  >
+                </div>
+              {% endif %}
+              
+              <div>
+                <div class="testimonial-card__author-name font-medium {% if section.settings.background_style == 'dark' %}text-white{% endif %}">
+                  {{ block.settings.author_name }}
+                </div>
+                
+                {% if block.settings.author_info != blank %}
+                  <div class="testimonial-card__author-info text-sm {% if section.settings.background_style == 'dark' %}text-gray-400{% else %}text-gray-500{% endif %}">
+                    {{ block.settings.author_info }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Khách Hàng Nói Gì Về Chúng Tôi"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Đánh giá từ khách hàng đã trải nghiệm sản phẩm của chúng tôi"
+    },
+    {
+      "type": "select",
+      "id": "background_style",
+      "label": "Background Style",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "light",
+          "label": "Light Gray"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
+      ],
+      "default": "light"
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Testimonial",
+      "type": "testimonial",
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "Rating",
+          "default": 5
+        },
+        {
+          "type": "textarea",
+          "id": "testimonial_text",
+          "label": "Testimonial Text",
+          "default": "\"Tôi rất hài lòng với chất lượng sản phẩm và dịch vụ khách hàng tuyệt vời. Chắc chắn sẽ mua sắm ở đây nhiều lần nữa!\""
+        },
+        {
+          "type": "text",
+          "id": "author_name",
+          "label": "Author Name",
+          "default": "Nguyễn Văn A"
+        },
+        {
+          "type": "text",
+          "id": "author_info",
+          "label": "Author Info",
+          "default": "Khách hàng thân thiết"
+        },
+        {
+          "type": "image_picker",
+          "id": "author_image",
+          "label": "Author Image"
+        }
+      }
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonials",
+      "blocks": [
+        {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "testimonial_text": "\"Sản phẩm chất lượng cao và dịch vụ khách hàng tuyệt vời. Tôi rất hài lòng với trải nghiệm mua sắm của mình!\"",
+            "author_name": "Nguyễn Văn A",
+            "author_info": "Khách hàng thân thiết"
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "testimonial_text": "\"Tôi đã mua nhiều sản phẩm từ cửa hàng này và luôn hài lòng với chất lượng. Giao hàng nhanh và đóng gói cẩn thận.\"",
+            "author_name": "Trần Thị B",
+            "author_info": "Khách hàng từ TP.HCM"
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "rating": 4,
+            "testimonial_text": "\"Sản phẩm đẹp và chất lượng như mô tả. Giá cả hợp lý và dịch vụ khách hàng rất tốt. Sẽ quay lại mua sắm!\"",
+            "author_name": "Lê Văn C",
+            "author_info": "Khách hàng mới"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

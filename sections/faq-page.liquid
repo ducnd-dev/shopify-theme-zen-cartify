@@ -1,0 +1,210 @@
+{% comment %}
+  FAQ page section
+  Filename: sections/faq-page.liquid
+  Used for: Frequently Asked Questions page content
+{% endcomment %}
+
+<div class="container mx-auto px-4 py-12 md:py-16 max-w-6xl">
+  <div class="text-center mb-12 animate-slide-up">
+    <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 font-poppins">{{ page.title }}</h1>
+    {% if page.content != blank %}
+      <div class="mx-auto max-w-2xl text-lg">{{ page.content }}</div>
+    {% endif %}
+  </div>
+
+  <div class="max-w-3xl mx-auto">
+    <!-- FAQ Categories -->
+    <div class="flex flex-wrap justify-center mb-8 gap-2">
+      {% for block in section.blocks %}
+        {% if block.type == 'category' %}
+          <button class="js-faq-category-btn px-4 py-2 rounded-full text-sm font-medium transition {% if forloop.first %}bg-primary text-white{% else %}bg-gray-100 hover:bg-gray-200{% endif %}" data-category="{{ block.settings.category_id }}">
+            {{ block.settings.category_name }}
+          </button>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- FAQ Items -->
+    <div class="space-y-4">
+      {% for block in section.blocks %}
+        {% if block.type == 'faq_item' %}
+          <div class="js-faq-item border border-gray-200 rounded-lg overflow-hidden" data-categories="{{ block.settings.categories }}">
+            <div class="js-accordion-header accordion__header bg-white hover:bg-gray-50 px-5 py-4 flex justify-between items-center cursor-pointer">
+              <h3 class="font-medium text-lg">{{ block.settings.question }}</h3>
+              <svg class="accordion__icon w-5 h-5 text-primary transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+            <div class="accordion__content bg-gray-50 px-5 py-0">
+              <div class="py-4">
+                {{ block.settings.answer }}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Contact CTA -->
+  <div class="text-center mt-16">
+    <p class="text-lg mb-4">Still have questions?</p>
+    <a href="{{ routes.contact_url }}" class="btn inline-flex items-center px-6 py-3 bg-primary hover:bg-primary-dark text-white font-medium rounded-md transition">
+      Contact Support
+      <svg class="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+      </svg>
+    </a>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "FAQ Page",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_categories",
+      "label": "Enable FAQ categories",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "text",
+          "id": "category_name",
+          "label": "Category name",
+          "default": "General"
+        },
+        {
+          "type": "text",
+          "id": "category_id",
+          "label": "Category ID (no spaces)",
+          "default": "general"
+        }
+      ]
+    },
+    {
+      "type": "faq_item",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "Frequently asked question"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Provide the answer to the question here. Keep it clear and concise.</p>"
+        },
+        {
+          "type": "text",
+          "id": "categories",
+          "label": "Categories (comma separated)",
+          "default": "general",
+          "info": "Match with Category IDs"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ Page",
+      "category": "Content",
+      "blocks": [
+        {
+          "type": "category",
+          "settings": {
+            "category_name": "General",
+            "category_id": "general"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "category_name": "Products",
+            "category_id": "products"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "category_name": "Shipping",
+            "category_id": "shipping"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "How do I track my order?",
+            "answer": "<p>You can track your order by logging into your account and visiting the order history section. Alternatively, you can use the tracking link provided in your shipping confirmation email.</p>",
+            "categories": "general,shipping"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "What payment methods do you accept?",
+            "answer": "<p>We accept all major credit cards, PayPal, Shop Pay, and Apple Pay.</p>",
+            "categories": "general"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "How do I return a product?",
+            "answer": "<p>To return a product, please visit our Returns page and fill out the return form. We offer a 30-day return policy on most items.</p>",
+            "categories": "products"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const categoryButtons = document.querySelectorAll('.js-faq-category-btn');
+    const faqItems = document.querySelectorAll('.js-faq-item');
+    
+    // Initialize accordion behavior
+    // This is already handled by theme.js
+    
+    // Category filtering
+    if (categoryButtons.length > 0) {
+      categoryButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const category = button.dataset.category;
+          
+          // Update active button
+          categoryButtons.forEach(btn => {
+            btn.classList.remove('bg-primary', 'text-white');
+            btn.classList.add('bg-gray-100');
+          });
+          
+          button.classList.remove('bg-gray-100');
+          button.classList.add('bg-primary', 'text-white');
+          
+          // Show/hide FAQ items
+          faqItems.forEach(item => {
+            const itemCategories = item.dataset.categories.split(',').map(c => c.trim());
+            
+            if (category === 'all' || itemCategories.includes(category)) {
+              item.style.display = 'block';
+            } else {
+              item.style.display = 'none';
+            }
+          });
+        });
+      });
+    }
+  });
+</script>

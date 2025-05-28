@@ -1,0 +1,215 @@
+{%- comment -%}
+  Featured Products Section
+  Displays a selection of featured products
+{%- endcomment -%}
+
+<section class="product-list py-12">
+  <div class="container mx-auto px-4">
+    <header class="text-center mb-10">
+      <h2 class="text-2xl md:text-3xl font-bold mb-3">{{ section.settings.title }}</h2>
+      {% if section.settings.subtitle != blank %}
+        <p class="text-gray-600 max-w-xl mx-auto">{{ section.settings.subtitle }}</p>
+      {% endif %}
+    </header>
+      <div class="product-grid">
+      {% for product in collections[section.settings.collection].products limit: section.settings.products_to_show %}
+        <div class="product-grid__item">
+          <div class="product-card group">
+            <a href="{{ product.url }}" class="block">
+              <!-- Product Image -->
+              <div class="product-card__image-wrapper relative rounded-lg overflow-hidden bg-gray-100 mb-4">
+              {% if product.featured_image != blank %}                <img
+                  src="{{ product.featured_image | image_url: width: 500 }}"
+                  alt="{{ product.featured_image.alt | default: product.title | escape }}"
+                  class="product-card__image transform group-hover:scale-105 transition-transform duration-300"
+                  width="500"
+                  height="500"
+                  loading="lazy"
+                >
+              {% else %}
+                <div class="w-full h-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              {% endif %}
+              
+              <!-- Product Badge (Sale, Sold Out, etc.) -->
+              {% if product.available == false %}
+                <span class="product-card__badge absolute top-2 right-2 bg-gray-800 text-white text-xs font-bold px-3 py-1 rounded-full">
+                  Sold Out
+                </span>
+              {% elsif product.compare_at_price > product.price %}
+                <span class="product-card__badge absolute top-2 right-2 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full">
+                  Sale
+                </span>
+              {% endif %}
+              
+              <!-- Quick Add Button (only shows on hover) -->
+              <div class="absolute bottom-0 left-0 right-0 p-4 bg-black bg-opacity-40 transform translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                <button
+                  type="button"
+                  class="product-card__quick-add w-full bg-white hover:bg-gray-100 text-text text-sm font-medium py-2 rounded-lg transition-colors"
+                  data-product-id="{{ product.id }}"
+                  aria-label="Quick add {{ product.title }}"
+                >
+                  Quick Add +
+                </button>
+              </div>
+            </div>
+              <!-- Product Info -->
+            <div class="product-card__info">
+              <h3 class="product-card__title text-sm font-medium mb-1 hover:text-primary transition-colors line-clamp-2" title="{{ product.title }}">
+                {{ product.title }}
+              </h3>
+              
+              <div class="product-card__price flex items-center mt-auto">
+                <span class="{% if product.compare_at_price > product.price %}text-accent font-semibold{% endif %}">
+                  {{ product.price | money }}
+                </span>
+                
+                {% if product.compare_at_price > product.price %}
+                  <span class="text-gray-500 text-xs line-through ml-2">
+                    {{ product.compare_at_price | money }}
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+            <!-- Add to Cart Button -->
+          <div class="product-card__add mt-3">
+            <form method="post" action="/cart/add" class="product-form">
+              <input type="hidden" name="id" value="{{ product.variants.first.id }}">
+              <input type="hidden" name="quantity" value="1">
+              
+              <button
+                type="submit"
+                class="product-card__add-btn js-add-to-cart w-full bg-gray-100 hover:bg-gray-200 text-text text-sm py-2 rounded-lg transition-colors {% if product.available == false %}opacity-50 cursor-not-allowed{% endif %}"
+                {% if product.available == false %}disabled{% endif %}
+              >
+                {% if product.available %}
+                  Add to Cart
+                {% else %}
+                  Sold Out
+                {% endif %}
+              </button>
+            </form>
+          </div>
+        </div>
+      {% else %}
+        <!-- Empty State -->
+        <div class="col-span-full text-center py-12">
+          <p class="text-gray-500">No products found</p>
+        </div>
+      {% endfor %}
+    </div>
+    
+    {% if section.settings.show_view_all %}      <div class="text-center mt-10">
+        <a href="{{ collections[section.settings.collection].url }}" class="inline-block border border-gray-300 hover:border-primary text-primary hover:bg-primary hover:text-white font-medium px-6 py-3 rounded-lg transition-colors">
+          {{ section.settings.view_all_text | default: 'Xem Tất Cả Sản Phẩm' }}
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Quick Add Functionality
+    const quickAddButtons = document.querySelectorAll('.product-card__quick-add');
+    
+    quickAddButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const productId = this.dataset.productId;
+        
+        // Change button text to show loading
+        this.innerHTML = 'Adding...';
+        
+        // Add the product to the cart
+        fetch('/cart/add.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            items: [
+              {
+                id: productId,
+                quantity: 1
+              }
+            ]
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Reset button text
+          this.innerHTML = 'Added!';
+          setTimeout(() => {
+            this.innerHTML = 'Quick Add +';
+          }, 2000);
+          
+          // Open cart drawer if it exists
+          if (typeof window.showCart === 'function') {
+            window.showCart();
+          }
+          
+          // Update cart count if needed
+          // This depends on how your theme handles cart count updates
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          this.innerHTML = 'Error!';
+          setTimeout(() => {
+            this.innerHTML = 'Quick Add +';
+          }, 2000);
+        });
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Featured Products",
+  "settings": [
+    {      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Sản Phẩm Nổi Bật"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Những lựa chọn phổ biến nhất từ bộ sưu tập của chúng tôi"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 4,
+      "label": "Products to show"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show View All button",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Products",
+      "category": "Product"
+    }
+  ]
+}
+{% endschema %}

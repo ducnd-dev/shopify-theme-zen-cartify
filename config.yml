@@ -1,0 +1,11 @@
+development:
+  password: shpat_XXXX_VOTRE_MOT_DE_PASSE_API_ICI
+  theme_id: "live"
+  store: votre-boutique.myshopify.com
+  directory: .
+  ignore_files:
+    - config/settings_data.json
+    - .git/
+    - .github/
+    - .gitignore
+    - node_modules/

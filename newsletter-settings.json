@@ -1,0 +1,10 @@
+{
+  "title": "Đăng Ký Nhận Thông Tin",
+  "subtitle": "Nhận thông tin về sản phẩm mới, khuyến mãi độc quyền và xu hướng mới nhất",
+  "placeholder_text": "Nhập email của bạn",
+  "button_text": "Đăng Ký",
+  "use_color_bg": true,
+  "show_disclaimer": true,
+  "disclaimer_text": "Bằng cách đăng ký, bạn đồng ý nhận email tiếp thị từ chúng tôi. Bạn có thể hủy đăng ký bất kỳ lúc nào.",
+  "show_divider": true
+}

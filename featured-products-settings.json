@@ -1,0 +1,9 @@
+{
+  "title": "Sản Phẩm Nổi Bật",
+  "subtitle": "Những lựa chọn phổ biến nhất từ bộ sưu tập của chúng tôi",
+  "collection": "featured",
+  "products_to_show": 4,
+  "show_view_all": true,
+  "view_all_text": "Xem Tất Cả Sản Phẩm",
+  "view_all_link": "/collections/all"
+}

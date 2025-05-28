@@ -1,0 +1,89 @@
+{% comment %}
+  Cart Drawer Items Snippet
+  This snippet is loaded via AJAX to update the cart drawer contents without reloading the page
+{% endcomment %}
+
+{% for item in cart.items %}
+  <div class="cart__item flex border-b border-gray-200 pb-4 mb-4">
+    <!-- Product Image -->
+    <div class="cart__item-image w-20 h-20 rounded overflow-hidden">
+      <img
+        src="{{ item.image | image_url: width: 100 }}"
+        alt="{{ item.title | escape }}"
+        width="100"
+        height="100"
+        class="w-full h-full object-cover"
+        loading="lazy"
+      >
+    </div>
+    
+    <!-- Product Details -->
+    <div class="cart__item-details flex-grow px-4">
+      <h3 class="cart__item-name text-sm font-medium">
+        <a href="{{ item.url }}" class="hover:text-primary">{{ item.product.title }}</a>
+      </h3>
+      
+      {% if item.product.has_only_default_variant == false %}
+        <p class="cart__item-variant text-xs text-gray-500">
+          {% for option in item.product.options %}
+            {{ option }}: {{ item.variant.options[forloop.index0] }}<br>
+          {% endfor %}
+        </p>
+      {% endif %}
+      
+      <!-- Price -->
+      <div class="cart__item-price text-sm mt-1">
+        {% if item.original_price != item.final_price %}
+          <span class="text-accent">{{ item.final_price | money }}</span>
+          <span class="line-through text-gray-500 text-xs ml-1">{{ item.original_price | money }}</span>
+        {% else %}
+          <span>{{ item.final_price | money }}</span>
+        {% endif %}
+      </div>
+      
+      <!-- Quantity Selector -->
+      <div class="cart__item-quantity mt-2 flex items-center js-quantity-selector" data-item-key="{{ item.key }}">
+        <button
+          type="button"
+          class="cart-qty-btn js-quantity-decrease w-6 h-6 flex items-center justify-center border border-gray-300 rounded"
+          aria-label="Decrease quantity"
+          data-action="decrease"
+        >
+          -
+        </button>
+        
+        <input
+          type="number"
+          class="js-quantity-input w-10 text-center mx-1 border-0 p-0"
+          value="{{ item.quantity }}"
+          min="1"
+          aria-label="Item quantity"
+          readonly
+        >
+        
+        <button
+          type="button"
+          class="cart-qty-btn js-quantity-increase w-6 h-6 flex items-center justify-center border border-gray-300 rounded"
+          aria-label="Increase quantity"
+          data-action="increase"
+        >
+          +
+        </button>
+      </div>
+    </div>
+    
+    <!-- Remove Button -->
+    <div class="cart__item-remove">
+      <button
+        type="button"
+        class="js-remove-item text-xs text-gray-500 hover:text-primary"
+        aria-label="Remove {{ item.product.title }}"
+        data-item-key="{{ item.key }}"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+  </div>
+{% endfor %}

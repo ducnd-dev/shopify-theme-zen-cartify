@@ -1,0 +1,226 @@
+{% comment %}
+  Customer Order Template
+  Filename: templates/customers/order.liquid
+  Used for: Displaying a specific customer order
+{% endcomment %}
+
+<div class="container mx-auto px-4 py-12 md:py-16 max-w-5xl animate-fade-in">
+  <div class="flex flex-col md:flex-row md:items-start gap-8">
+    <!-- Sidebar/Navigation -->
+    <div class="w-full md:w-64 shrink-0">
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6">
+          <h2 class="font-medium text-lg mb-6">{{ 'customer.account.title' | t }}</h2>
+          <nav class="space-y-1">
+            <a href="{{ routes.account_url }}" class="block px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-primary hover:bg-opacity-10 hover:text-primary">
+              {{ 'customer.account.dashboard' | t }}
+            </a>
+            <a href="{{ routes.account_url }}#orders" class="block px-3 py-2 rounded-md text-sm font-medium bg-primary bg-opacity-10 text-primary">
+              {{ 'customer.orders.title' | t }}
+            </a>
+            <a href="{{ routes.account_addresses_url }}" class="block px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-primary hover:bg-opacity-10 hover:text-primary">
+              {{ 'customer.account.addresses' | t }}
+            </a>
+            <form method="post" action="{{ routes.account_logout_url }}">
+              <button type="submit" class="w-full text-left block px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600">
+                {{ 'customer.account.log_out' | t }}
+              </button>
+            </form>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-grow">
+      <!-- Order details -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+        <div class="p-6">
+          <div class="flex flex-wrap items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold font-poppins">{{ 'customer.order.title' | t: name: order.name }}</h1>
+            <a href="{{ routes.account_url }}" class="text-primary hover:underline text-sm flex items-center">
+              <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              {{ 'customer.order.back_to_account' | t }}
+            </a>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h3 class="text-sm uppercase text-gray-500 font-medium mb-1">{{ 'customer.order.date' | t }}</h3>
+              <p class="text-gray-800">{{ order.created_at | date: format: 'medium' }}</p>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h3 class="text-sm uppercase text-gray-500 font-medium mb-1">{{ 'customer.order.payment_status' | t }}</h3>
+              <p class="flex items-center">
+                <span class="inline-block w-2 h-2 rounded-full mr-2
+                {% if order.financial_status == 'paid' %}bg-green-500
+                {% elsif order.financial_status == 'pending' %}bg-yellow-500
+                {% else %}bg-gray-500{% endif %}"></span>
+                <span class="text-gray-800">{{ order.financial_status_label }}</span>
+              </p>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h3 class="text-sm uppercase text-gray-500 font-medium mb-1">{{ 'customer.order.fulfillment_status' | t }}</h3>
+              <p class="flex items-center">
+                <span class="inline-block w-2 h-2 rounded-full mr-2
+                {% if order.fulfillment_status == 'fulfilled' %}bg-green-500
+                {% elsif order.fulfillment_status == 'partial' %}bg-yellow-500
+                {% elsif order.fulfillment_status == 'restocked' %}bg-red-500
+                {% else %}bg-gray-500{% endif %}"></span>
+                <span class="text-gray-800">{{ order.fulfillment_status_label }}</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Order items -->
+          <div class="mb-8">
+            <h2 class="text-xl font-bold font-poppins mb-4">{{ 'customer.order.order_details' | t }}</h2>
+            
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ 'customer.order.product' | t }}</th>
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ 'customer.order.sku' | t }}</th>
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ 'customer.order.price' | t }}</th>
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ 'customer.order.quantity' | t }}</th>
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ 'customer.order.total' | t }}</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  {% for line_item in order.line_items %}
+                    <tr>
+                      <td class="px-4 py-4">
+                        <div class="flex items-center">
+                          <div class="flex-shrink-0 h-16 w-16 bg-gray-100 rounded overflow-hidden border border-gray-200">
+                            {% if line_item.image %}
+                              <img class="h-full w-full object-cover" src="{{ line_item.image | img_url: width: 120, height: 120, crop: 'center' }}" alt="{{ line_item.title | escape }}" loading="lazy">
+                            {% else %}
+                              <div class="h-full w-full flex items-center justify-center bg-gray-100">
+                                <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                              </div>
+                            {% endif %}
+                          </div>
+                          <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">
+                              {% if line_item.product.handle %}
+                                <a href="/products/{{ line_item.product.handle }}" class="hover:text-primary hover:underline">{{ line_item.title }}</a>
+                              {% else %}
+                                {{ line_item.title }}
+                              {% endif %}
+                            </div>
+                            {% if line_item.variant.title != 'Default Title' %}
+                              <div class="text-sm text-gray-500">
+                                {{ line_item.variant.title }}
+                              </div>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </td>
+                      <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ line_item.sku }}
+                      </td>
+                      <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ line_item.price | money }}
+                      </td>
+                      <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ line_item.quantity }}
+                      </td>
+                      <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ line_item.line_price | money }}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot class="bg-gray-50">
+                  <tr>
+                    <td colspan="4" class="px-4 py-3 text-right text-sm font-medium text-gray-500">{{ 'customer.order.subtotal' | t }}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{ order.line_items_subtotal_price | money }}</td>
+                  </tr>
+                  
+                  {% for discount in order.discounts %}
+                    <tr>
+                      <td colspan="4" class="px-4 py-3 text-right text-sm font-medium text-gray-500">
+                        {{ 'customer.order.discount' | t }}
+                        {% if discount.code %}<span class="text-gray-400">({{ discount.code }})</span>{% endif %}
+                      </td>
+                      <td class="px-4 py-3 whitespace-nowrap text-sm text-red-600">-{{ discount.amount | money }}</td>
+                    </tr>
+                  {% endfor %}
+                  
+                  {% for shipping_method in order.shipping_methods %}
+                    <tr>
+                      <td colspan="4" class="px-4 py-3 text-right text-sm font-medium text-gray-500">
+                        {{ 'customer.order.shipping' | t }} ({{ shipping_method.title }})
+                      </td>
+                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{ shipping_method.price | money }}</td>
+                    </tr>
+                  {% endfor %}
+                  
+                  {% for tax_line in order.tax_lines %}
+                    <tr>
+                      <td colspan="4" class="px-4 py-3 text-right text-sm font-medium text-gray-500">
+                        {{ 'customer.order.tax' | t }} ({{ tax_line.title }} {{ tax_line.rate | times: 100 }}%)
+                      </td>
+                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{ tax_line.price | money }}</td>
+                    </tr>
+                  {% endfor %}
+                  
+                  <tr class="border-t border-gray-300">
+                    <td colspan="4" class="px-4 py-4 text-right text-base font-bold text-gray-900">{{ 'customer.order.total' | t }}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-base font-bold text-gray-900">{{ order.total_price | money }}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- Shipping and Billing Details -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {% if order.shipping_address %}
+              <div>
+                <h2 class="text-xl font-bold font-poppins mb-4">{{ 'customer.order.shipping_address' | t }}</h2>
+                <div class="bg-gray-50 rounded-lg p-4">
+                  <p class="mb-1">{{ order.shipping_address.name }}</p>
+                  {% if order.shipping_address.company %}
+                    <p class="mb-1">{{ order.shipping_address.company }}</p>
+                  {% endif %}
+                  <p class="mb-1">{{ order.shipping_address.address1 }}</p>
+                  {% if order.shipping_address.address2 %}
+                    <p class="mb-1">{{ order.shipping_address.address2 }}</p>
+                  {% endif %}
+                  <p class="mb-1">{{ order.shipping_address.city }}, {{ order.shipping_address.province_code }} {{ order.shipping_address.zip }}</p>
+                  <p>{{ order.shipping_address.country }}</p>
+                </div>
+              </div>
+            {% endif %}
+
+            {% if order.billing_address %}
+              <div>
+                <h2 class="text-xl font-bold font-poppins mb-4">{{ 'customer.order.billing_address' | t }}</h2>
+                <div class="bg-gray-50 rounded-lg p-4">
+                  <p class="mb-1">{{ order.billing_address.name }}</p>
+                  {% if order.billing_address.company %}
+                    <p class="mb-1">{{ order.billing_address.company }}</p>
+                  {% endif %}
+                  <p class="mb-1">{{ order.billing_address.address1 }}</p>
+                  {% if order.billing_address.address2 %}
+                    <p class="mb-1">{{ order.billing_address.address2 }}</p>
+                  {% endif %}
+                  <p class="mb-1">{{ order.billing_address.city }}, {{ order.billing_address.province_code }} {{ order.billing_address.zip }}</p>
+                  <p>{{ order.billing_address.country }}</p>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

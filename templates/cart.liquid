@@ -1,0 +1,356 @@
+{%- comment -%}
+  Cart Template
+  Displays the shopping cart page
+{%- endcomment -%}
+
+<div class="cart py-8 md:py-12">
+  <div class="container mx-auto px-4">
+    <h1 class="text-2xl md:text-3xl font-bold mb-8 text-center">Your Cart</h1>
+    
+    {% if cart.item_count > 0 %}
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Cart Items -->
+        <div class="lg:col-span-2">
+          <div class="cart__items bg-white rounded-lg shadow-sm p-6">
+            <!-- Cart Header (Desktop only) -->
+            <div class="hidden md:grid md:grid-cols-12 text-sm font-medium text-gray-500 mb-4 pb-2 border-b">
+              <div class="md:col-span-6">Product</div>
+              <div class="md:col-span-2 text-center">Price</div>
+              <div class="md:col-span-2 text-center">Quantity</div>
+              <div class="md:col-span-2 text-right">Total</div>
+            </div>
+            
+            <!-- Cart Items List -->
+            <div class="space-y-6">
+              {% for item in cart.items %}
+                <div class="cart__item flex flex-col md:grid md:grid-cols-12 gap-4 py-4 border-b border-gray-200">
+                  <!-- Product Info (Image + Title) -->
+                  <div class="md:col-span-6 flex">
+                    <!-- Product Image -->
+                    <div class="cart__item-image w-20 h-20 rounded overflow-hidden mr-4">
+                      <a href="{{ item.url }}">
+                        <img
+                          src="{{ item.image | image_url: width: 150 }}"
+                          alt="{{ item.title | escape }}"
+                          width="80"
+                          height="80"
+                          class="w-full h-full object-cover"
+                          loading="lazy"
+                        >
+                      </a>
+                    </div>
+                    
+                    <!-- Product Title & Variant -->
+                    <div class="cart__item-details flex-grow">
+                      <h3 class="cart__item-name text-sm font-medium">
+                        <a href="{{ item.url }}" class="hover:text-primary transition-colors">
+                          {{ item.product.title }}
+                        </a>
+                      </h3>
+                      
+                      {% if item.product.has_only_default_variant == false %}
+                        <p class="cart__item-variant text-xs text-gray-500 mt-1">
+                          {% for option in item.product.options %}
+                            {{ option }}: {{ item.variant.options[forloop.index0] }}<br>
+                          {% endfor %}
+                        </p>
+                      {% endif %}
+                      
+                      <!-- Remove (visible on mobile) -->
+                      <div class="cart__item-mobile-actions flex items-center justify-between mt-2 md:hidden">
+                        <span class="text-sm font-medium">
+                          {{ item.final_price | money }}
+                        </span>
+                        
+                        <button
+                          type="button"
+                          class="cart__remove text-xs text-gray-500 hover:text-primary underline"
+                          aria-label="Remove {{ item.title | escape }}"
+                          data-line="{{ forloop.index }}"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Price (desktop) -->
+                  <div class="hidden md:block md:col-span-2 text-center">
+                    <span class="text-sm">
+                      {{ item.final_price | money }}
+                    </span>
+                  </div>
+                  
+                  <!-- Quantity -->
+                  <div class="md:col-span-2 flex justify-center">
+                    <div class="cart__item-quantity inline-flex border border-gray-300 rounded-md">
+                      <button
+                        type="button"
+                        class="cart-qty-btn minus w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100"
+                        aria-label="Decrease quantity"
+                        data-line="{{ forloop.index }}"
+                        data-action="decrease"
+                      >
+                        -
+                      </button>
+                      
+                      <input
+                        type="number"
+                        class="w-10 h-8 text-center border-0 p-0"
+                        value="{{ item.quantity }}"
+                        min="1"
+                        aria-label="Item quantity"
+                        data-line="{{ forloop.index }}"
+                        readonly
+                      >
+                      
+                      <button
+                        type="button"
+                        class="cart-qty-btn plus w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100"
+                        aria-label="Increase quantity"
+                        data-line="{{ forloop.index }}"
+                        data-action="increase"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- Total Price & Remove (desktop) -->
+                  <div class="hidden md:flex md:col-span-2 justify-end items-start">
+                    <div class="cart__item-total text-sm font-medium mr-4">
+                      {{ item.final_line_price | money }}
+                    </div>
+                    
+                    <button
+                      type="button"
+                      class="cart__remove text-gray-400 hover:text-primary"
+                      aria-label="Remove {{ item.title | escape }}"
+                      data-line="{{ forloop.index }}"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        
+        <!-- Cart Summary -->
+        <div class="lg:col-span-1">
+          <div class="cart-summary bg-white rounded-lg shadow-sm p-6 sticky top-20">
+            <h2 class="text-lg font-medium mb-4">Order Summary</h2>
+            
+            <div class="space-y-2 mb-4">
+              <div class="flex justify-between">
+                <span>Subtotal</span>
+                <span class="font-medium">{{ cart.total_price | money }}</span>
+              </div>
+              
+              <div class="flex justify-between text-gray-600">
+                <span>Shipping</span>
+                <span>Calculated at checkout</span>
+              </div>
+              
+              {% if cart.total_discounts > 0 %}
+                <div class="flex justify-between text-accent">
+                  <span>Discount</span>
+                  <span>-{{ cart.total_discounts | money }}</span>
+                </div>
+              {% endif %}
+            </div>
+            
+            <div class="border-t border-gray-200 pt-4 mb-6">
+              <div class="flex justify-between text-lg font-medium">
+                <span>Total</span>
+                <span>{{ cart.total_price | money }}</span>
+              </div>
+            </div>
+            
+            <!-- Checkout Button -->
+            <a 
+              href="/checkout" 
+              class="cart-summary__checkout-btn block w-full bg-primary hover:bg-primary-dark text-white text-center font-medium py-3 px-6 rounded-lg transition-colors mb-4"
+              aria-label="Proceed to checkout"
+            >
+              Proceed to Checkout
+            </a>
+            
+            <!-- Continue Shopping -->
+            <a 
+              href="/collections/all" 
+              class="block w-full text-center text-primary hover:text-primary-dark transition-colors"
+            >
+              Continue Shopping
+            </a>
+            
+            <!-- Payment Icons -->
+            <div class="mt-6 pt-6 border-t border-gray-200">
+              <p class="text-xs text-gray-500 text-center mb-2">Secure checkout with</p>
+              <div class="flex justify-center space-x-2">
+                <span class="payment-icon">
+                  <svg width="38" height="24" viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="opacity-60">
+                    <rect width="38" height="24" rx="4" fill="#252525"/>
+                    <path d="M14.9211 15.7543H12.7379L14.0721 8.2457H16.2553L14.9211 15.7543Z" fill="white"/>
+                    <path d="M23.2127 8.4803C22.6901 8.2692 21.8889 8.0347 20.8923 8.0347C18.6387 8.0347 17.0904 9.1821 17.0786 10.8599C17.0669 12.0895 18.1932 12.7739 18.9944 13.1906C19.8193 13.6191 20.0769 13.9058 20.0769 14.3108C20.0651 14.9365 19.3459 15.2232 18.68 15.2232C17.7613 15.2232 17.2739 15.0708 16.5311 14.7255L16.2265 14.5847L15.8984 16.2741C16.5193 16.5608 17.6456 16.8124 18.8139 16.8242C21.2201 16.8242 22.7449 15.6885 22.7567 13.8877C22.7685 12.9143 22.1195 12.1595 20.8805 11.5104C20.1025 11.1054 19.6386 10.8304 19.6386 10.3784C19.6504 9.96217 20.1025 9.53468 21.0329 9.53468C21.8038 9.52348 22.3734 9.71143 22.8023 9.89938L23.0247 10.0164L23.2127 8.4803Z" fill="white"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M27.5532 8.24561H25.8787C25.4031 8.24561 25.0633 8.38622 24.8761 8.88097L22.4818 15.7541H24.8995L25.2747 14.6302L27.3308 14.6304C27.3894 14.8744 27.5824 15.7541 27.5824 15.7541H29.694L27.5532 8.24561ZM25.8553 13.0033L26.6099 10.4969C26.6099 10.4969 26.8323 9.84362 26.9499 9.48014L27.0558 9.88535C27.0558 9.88535 27.5198 12.8039 27.6139 13.0033H25.8553Z" fill="white"/>
+                    <path d="M11.1661 8.24561L8.94167 13.5099L8.70684 12.3272C8.29056 11.1328 7.15359 9.84363 5.87695 9.17043L7.9295 15.7423H10.3707L13.6082 8.24561H11.1661Z" fill="white"/>
+                    <path d="M7.29578 9.17044H3.81055L3.76416 9.37078C6.51359 10.0087 8.35387 11.5097 9.00467 13.51L8.30845 9.91492C8.17905 9.40898 7.80436 9.19624 7.29578 9.17044Z" fill="#F79F1A"/>
+                  </svg>
+                </span>
+                <span class="payment-icon">
+                  <svg width="38" height="24" viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="opacity-60">
+                    <rect width="38" height="24" rx="4" fill="#252525"/>
+                    <path d="M15.3498 7.09967H22.6498V16.8997H15.3498V7.09967Z" fill="#FF5F00"/>
+                    <path d="M15.8999 11.9997C15.8999 10.1997 16.7999 8.59967 18.0999 7.59967C17.1999 6.89967 16.0999 6.49967 14.8999 6.49967C11.9999 6.49967 9.59985 8.89967 9.59985 11.9997C9.59985 15.0997 11.9999 17.4997 14.8999 17.4997C16.0999 17.4997 17.1999 17.0997 18.0999 16.3997C16.7999 15.3997 15.8999 13.7997 15.8999 11.9997Z" fill="#EB001B"/>
+                    <path d="M28.3996 11.9997C28.3996 15.0997 25.9996 17.4997 23.0996 17.4997C21.8996 17.4997 20.7996 17.0997 19.8996 16.3997C21.1996 15.3997 22.0996 13.7997 22.0996 11.9997C22.0996 10.1997 21.1996 8.59967 19.8996 7.59967C20.7996 6.89967 21.8996 6.49967 23.0996 6.49967C25.9996 6.49967 28.3996 8.89967 28.3996 11.9997Z" fill="#F79E1B"/>
+                  </svg>
+                </span>
+                <span class="payment-icon">
+                  <svg width="38" height="24" viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="opacity-60">
+                    <rect width="38" height="24" rx="4" fill="#252525"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M9.5 10.0026V15.8602H11.1107V13.8931H12.031C13.3955 13.8931 14.4196 13.0165 14.4196 11.939C14.4196 10.8614 13.3955 9.99999 12.031 9.99999H9.5V10.0026ZM12.0126 12.7459H11.1107V11.1472H12.0126C12.5217 11.1472 12.8032 11.4809 12.8032 11.939C12.8032 12.4025 12.5217 12.7459 12.0126 12.7459ZM14.9603 15.8602H16.5341V13.1101C16.5341 12.5546 16.8759 12.1332 17.4135 12.1332C17.6687 12.1332 17.9755 12.1977 18.1729 12.3026L18.5147 10.8668C18.2842 10.7429 17.9092 10.6569 17.5985 10.6569C17.0841 10.6569 16.622 10.9584 16.4246 11.5241H16.3899V10.7348H14.9524L14.9603 15.8602ZM21.7353 11.1901C22.3049 11.1901 22.672 11.4246 22.9473 11.6688L23.7223 10.6569C23.2657 10.2194 22.5204 9.89209 21.6394 9.89209C20.1688 9.89209 19.0741 10.8507 19.0741 12.3107C19.0741 13.7013 20.0456 14.5833 21.5641 14.5833C22.4504 14.5833 23.1384 14.2818 23.6095 13.8067L22.8503 12.8379C22.575 13.066 22.2373 13.2455 21.7248 13.2455C21.0235 13.2455 20.5486 12.8433 20.5486 12.3107C20.5486 11.778 21.0261 11.1901 21.7353 11.1901ZM26.9581 10.6623C26.5805 10.6623 26.2374 10.7563 25.9779 10.9584C25.7157 11.1579 25.5578 11.4509 25.4929 11.8069H28.433C28.3918 11.0659 27.767 10.6623 26.9581 10.6623ZM28.4357 12.8111H29.9089C29.8567 11.3123 28.8537 9.89209 26.9264 9.89209C25.2324 9.89209 23.9729 11.0337 23.9729 12.7513C23.9729 14.4421 25.1671 15.6603 27.0083 15.6603C27.9467 15.6603 28.6638 15.3748 29.2228 14.7828L28.2251 13.9115C27.9467 14.2013 27.5533 14.3781 27.0399 14.3781C26.2952 14.3781 25.6627 13.9851 25.4929 13.1048H28.433L28.4357 12.8111ZM7.07404 15.8602H8.64782V10.0026H7.07404V15.8602Z" fill="white"/>
+                  </svg>
+                </span>
+                <span class="payment-icon">
+                  <svg width="38" height="24" viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="opacity-60">
+                    <rect width="38" height="24" rx="4" fill="#252525"/>
+                    <path d="M22.201 9.13905H25.5384V17.6265H22.201V9.13905Z" fill="#002D74"/>
+                    <path d="M23.8525 6.37354C23.074 6.37354 22.4199 6.99096 22.4199 7.94181C22.4199 8.88375 23.0395 9.51449 23.817 9.51449C24.6046 9.51449 25.2587 8.88375 25.2587 7.94181C25.2587 6.98204 24.6046 6.37354 23.8525 6.37354Z" fill="#002D74"/>
+                    <path d="M30.0245 11.7871C29.3794 11.7871 28.7614 11.9495 28.3042 12.4891V11.8509H25.0686V17.627H28.317V14.2673C28.317 13.5754 28.5887 12.8922 29.4472 12.8922C30.3057 12.8922 30.5322 13.5754 30.5322 14.2584V17.627H33.7805V13.7645C33.7805 12.3511 33.1816 11.7871 30.0245 11.7871Z" fill="#002D74"/>
+                    <path d="M16.1022 9.13916H13.1953V5.99927H9.9375V9.13916H8.17578V11.8422H9.9375V15.4622C9.9375 17.8539 10.7152 18.0005 13.0733 18.0005H16.1022V15.2907H14.0693C13.474 15.2907 13.1953 15.2907 13.1953 14.5363V11.8422H16.1022V9.13916Z" fill="#002D74"/>
+                    <path d="M18.1415 14.7364C18.1415 15.4283 18.7368 15.9678 19.4537 15.9678C20.1885 15.9678 20.7837 15.4283 20.7837 14.7364C20.7837 14.0355 20.1885 13.4869 19.4537 13.4869C18.7368 13.4869 18.1415 14.0355 18.1415 14.7364Z" fill="#002D74"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <!-- Empty Cart -->
+      <div class="cart__empty bg-white rounded-lg shadow-sm p-12 text-center max-w-xl mx-auto">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+        
+        <h2 class="text-xl font-medium mb-4">Your cart is empty</h2>
+        <p class="text-gray-600 mb-6">Looks like you haven't added anything to your cart yet.</p>
+        
+        <a href="/collections/all" class="inline-block bg-primary hover:bg-primary-dark text-white font-medium px-6 py-3 rounded-lg transition-colors">
+          Start Shopping
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Quantity update
+    const quantityButtons = document.querySelectorAll('.cart-qty-btn');
+    
+    quantityButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const line = parseInt(this.dataset.line);
+        const action = this.dataset.action;
+        const quantityInput = this.parentNode.querySelector('input');
+        let quantity = parseInt(quantityInput.value);
+        
+        if (action === 'increase') {
+          quantity += 1;
+        } else if (action === 'decrease' && quantity > 1) {
+          quantity -= 1;
+        }
+        
+        // Update cart
+        updateCartItem(line, quantity);
+      });
+    });
+    
+    // Remove item
+    const removeButtons = document.querySelectorAll('.cart__remove');
+    
+    removeButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const line = parseInt(this.dataset.line);
+        updateCartItem(line, 0);
+      });
+    });
+    
+    // Update cart item quantity
+    function updateCartItem(line, quantity) {
+      // Show loading state
+      document.body.classList.add('cursor-wait');
+      
+      fetch('/cart/change.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          line: line,
+          quantity: quantity
+        })
+      })      .then(response => response.json())
+      .then(cart => {
+        // Update cart count
+        const cartCountElements = document.querySelectorAll('.js-cart-count');
+        cartCountElements.forEach(element => {
+          element.textContent = cart.item_count;
+          element.classList.toggle('hidden', cart.item_count === 0);
+        });
+        
+        // If cart is empty, show empty state
+        if (cart.item_count === 0) {
+          document.querySelector('.cart__items-container').innerHTML = `
+            <div class="text-center py-12">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              <h2 class="text-2xl font-medium mb-2">Your cart is empty</h2>
+              <p class="text-gray-500 mb-8">Looks like you haven't added anything to your cart yet.</p>
+              <a href="/collections/all" class="inline-block bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg transition-colors">
+                Start Shopping
+              </a>
+            </div>
+          `;
+          document.querySelector('.cart__summary').classList.add('hidden');
+        } else {
+          // Update subtotal and items
+          const subtotalElement = document.querySelector('.cart__subtotal');
+          if (subtotalElement) {
+            // Format money
+            function formatMoney(cents) {
+              return (cents / 100).toLocaleString('en-US', {
+                style: 'currency',
+                currency: '{{ cart.currency.iso_code }}'
+              });
+            }
+            
+            subtotalElement.textContent = formatMoney(cart.total_price);
+          }
+          
+          // Update item quantities and prices
+          cart.items.forEach((item, index) => {
+            const itemRow = document.querySelector(`[data-line="${index + 1}"]`);
+            if (itemRow) {
+              const quantityInput = itemRow.querySelector('.cart__item-quantity-input');
+              const itemPrice = itemRow.querySelector('.cart__item-price');
+              
+              if (quantityInput) quantityInput.value = item.quantity;
+              if (itemPrice) itemPrice.textContent = formatMoney(item.final_line_price);
+            }
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        document.body.classList.remove('cursor-wait');
+      });
+    }
+  });
+</script>

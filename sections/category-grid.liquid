@@ -1,0 +1,140 @@
+{%- comment -%}
+  Category Grid Section
+  Displays a grid of product categories
+{%- endcomment -%}
+
+<section class="category-grid py-12 bg-background">
+  <div class="container mx-auto px-4">
+    <header class="text-center mb-10">
+      <h2 class="text-2xl md:text-3xl font-bold mb-3">{{ section.settings.title }}</h2>
+      {% if section.settings.subtitle != blank %}
+        <p class="text-gray-600 max-w-xl mx-auto">{{ section.settings.subtitle }}</p>
+      {% endif %}
+    </header>
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+      {% for block in section.blocks %}
+        {% if block.type == 'category_card' %}
+          <a href="{{ block.settings.link }}" class="category-card group block">
+            <div class="aspect-w-1 aspect-h-1 bg-gray-100 rounded-lg overflow-hidden relative">
+              {% if block.settings.image != blank %}
+                <img
+                  src="{{ block.settings.image | image_url: width: 500 }}"
+                  alt="{{ block.settings.title | escape }}"
+                  class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  width="500"
+                  height="500"
+                  loading="lazy"
+                >
+              {% else %}
+                <div class="w-full h-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              {% endif %}
+              
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4 md:p-6">
+                <div class="w-full">
+                  <div class="category-card__title text-white font-medium md:text-lg mb-1">
+                    {{ block.settings.title }}
+                  </div>
+                  
+                  {% if block.settings.show_count %}
+                    <div class="category-card__count text-white text-xs md:text-sm opacity-80">
+                      {% if block.settings.custom_count != blank %}
+                        {{ block.settings.custom_count }}
+                      {% else %}
+                        {{ collections[block.settings.collection].products_count }} products
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Category Grid",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Shop by Category"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle"
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Category Card",
+      "type": "category_card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Category Title",
+          "default": "Category"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Category Image"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Category Link"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection",
+          "info": "Used to display product count"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_count",
+          "label": "Show product count",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "custom_count",
+          "label": "Custom count text",
+          "info": "Overrides automatic product count"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Category Grid",
+      "blocks": [
+        {
+          "type": "category_card"
+        },
+        {
+          "type": "category_card"
+        },
+        {
+          "type": "category_card"
+        },
+        {
+          "type": "category_card"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

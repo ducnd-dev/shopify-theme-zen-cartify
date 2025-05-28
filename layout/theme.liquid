@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="{{ shop.locale }}">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="{{ page_description | escape }}">
+  <link rel="canonical" href="{{ canonical_url }}">
+  
+  <!-- Title and meta tags -->
+  <title>{{ page_title }}{% if page_title contains shop.name %}{% else %} - {{ shop.name }}{% endif %}</title>
+  {% if page_description %}
+    <meta name="description" content="{{ page_description | escape }}">
+  {% endif %}
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Favicon -->
+  {% if settings.favicon != blank %}
+    <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32 }}">
+  {% endif %}
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com" defer></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            accent: '#10B981',
+            background: '#F9FAFB',
+            text: '#1F2937',
+          },
+          fontFamily: {
+            'inter': ['Inter', 'sans-serif'],
+            'poppins': ['Poppins', 'sans-serif'],
+            'sans': ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+    <!-- Custom CSS -->
+  {{ 'theme.css' | asset_url | stylesheet_tag }}
+  {{ 'product-card.css' | asset_url | stylesheet_tag }}
+  <!-- JavaScript -->
+  <script src="{{ 'theme.js' | asset_url }}" defer></script>
+  <script src="{{ 'accessibility-improvements.js' | asset_url }}" defer></script>
+  <script src="{{ 'cart-drawer.js' | asset_url }}" defer></script>
+  <script src="{{ 'cart-drawer.js' | asset_url }}" defer></script>
+  
+  <!-- Theme settings -->
+  <script>
+    window.theme = {
+      moneyFormat: {{ shop.money_format | json }},
+      cartEnabled: true
+    };
+  </script>
+  
+  <!-- Shopify-specific head content -->
+  {{ content_for_header }}
+</head>
+<body class="font-sans bg-background text-text min-h-screen flex flex-col">
+  <!-- Header/Navigation -->
+  {% section 'header' %}
+  
+  <!-- Main Content -->
+  <main role="main" id="main-content" class="flex-grow">
+    {{ content_for_layout }}
+  </main>
+  
+  <!-- Footer -->
+  {% section 'footer' %}
+  
+  <!-- Cart Drawer -->
+  {% section 'cart-drawer' %}
+  
+  <!-- Custom Scripts -->
+  <script>
+    // Initialize modules after DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      // Theme JavaScript will be initialized here
+    });
+  </script>
+</body>
+</html>
