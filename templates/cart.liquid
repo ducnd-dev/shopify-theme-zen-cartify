@@ -28,9 +28,8 @@
                   <div class="md:col-span-6 flex">
                     <!-- Product Image -->
                     <div class="cart__item-image w-20 h-20 rounded overflow-hidden mr-4">
-                      <a href="{{ item.url }}">
-                        <img
-                          src="{{ item.image | image_url: width: 150 }}"
+                      <a href="{{ item.url }}">                        <img
+                          src="{{ item.image | img_url: '150x150' }}"
                           alt="{{ item.title | escape }}"
                           width="80"
                           height="80"

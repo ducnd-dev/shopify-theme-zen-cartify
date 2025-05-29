@@ -1,6 +1,12 @@
 {%- comment -%}
   Hero Section
-  Main banner for homepage
+             <img 
+              src="{{ section.settings.image | img_url: '800x' }}" 
+              alt="{{ section.settings.image_alt | default: section.settings.heading }}"
+              class="w-full h-auto rounded-lg shadow-lg"
+              width="800"
+              height="600"
+              loading="eager">anner for homepage
 {%- endcomment -%}
 
 <section class="hero bg-gradient-to-b from-gray-50 to-background py-12 md:py-16 lg:py-20">

@@ -96,9 +96,8 @@
                     <tr>
                       <td class="px-4 py-4">
                         <div class="flex items-center">
-                          <div class="flex-shrink-0 h-16 w-16 bg-gray-100 rounded overflow-hidden border border-gray-200">
-                            {% if line_item.image %}
-                              <img class="h-full w-full object-cover" src="{{ line_item.image | img_url: width: 120, height: 120, crop: 'center' }}" alt="{{ line_item.title | escape }}" loading="lazy">
+                          <div class="flex-shrink-0 h-16 w-16 bg-gray-100 rounded overflow-hidden border border-gray-200">                            {% if line_item.image %}
+                              <img class="h-full w-full object-cover" src="{{ line_item.image | img_url: '120x120', crop: 'center' }}" alt="{{ line_item.title | escape }}" loading="lazy">
                             {% else %}
                               <div class="h-full w-full flex items-center justify-center bg-gray-100">
                                 <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

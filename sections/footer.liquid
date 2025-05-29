@@ -8,10 +8,9 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
       <!-- About/Logo Column -->
       <div class="footer__brand">
-        <div class="mb-4">
-          {% if section.settings.footer_logo != blank %}
+        <div class="mb-4">          {% if section.settings.footer_logo != blank %}
             <img 
-              src="{{ section.settings.footer_logo | image_url: width: 150 }}" 
+              src="{{ section.settings.footer_logo | img_url: '150x' }}" 
               alt="{{ shop.name }}"
               class="h-8 w-auto"
               width="150" 

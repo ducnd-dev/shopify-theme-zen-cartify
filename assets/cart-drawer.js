@@ -56,16 +56,36 @@ class CartDrawer {
       this.open();
     }
   }
-  
-  open() {
+    open() {
     if (!this.drawer) return;
     
+    // Store the element that had focus before opening drawer
+    this.previousFocus = document.activeElement;
+    
     this.drawer.classList.remove('translate-x-full');
+    this.drawer.setAttribute('aria-hidden', 'false');
+    
     if (this.overlay) {
       this.overlay.classList.remove('hidden');
     }
     document.body.classList.add('overflow-hidden');
     this.isOpen = true;
+    
+    // Update ARIA attributes
+    this.toggleButtons.forEach(button => {
+      button.setAttribute('aria-expanded', 'true');
+    });
+    
+    // Focus first focusable element in drawer
+    setTimeout(() => {
+      const firstFocusable = this.drawer.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (firstFocusable) {
+        firstFocusable.focus();
+      }
+      
+      // Setup focus trap
+      this.setupFocusTrap();
+    }, 100);
     
     // Refresh cart contents
     this.fetchAndUpdateCart();
@@ -75,11 +95,23 @@ class CartDrawer {
     if (!this.drawer) return;
     
     this.drawer.classList.add('translate-x-full');
+    this.drawer.setAttribute('aria-hidden', 'true');
+    
     if (this.overlay) {
       this.overlay.classList.add('hidden');
     }
     document.body.classList.remove('overflow-hidden');
     this.isOpen = false;
+    
+    // Update ARIA attributes
+    this.toggleButtons.forEach(button => {
+      button.setAttribute('aria-expanded', 'false');
+    });
+    
+    // Return focus to element that had focus before drawer was opened
+    if (this.previousFocus) {
+      this.previousFocus.focus();
+    }
   }
   
   formatMoney(cents) {
@@ -265,6 +297,46 @@ class CartDrawer {
     } catch (error) {
       console.error('Error updating item quantity:', error);
     }
+  }
+}
+
+  /**
+   * Sets up a focus trap within the drawer to keep keyboard focus inside
+   * the drawer when it's open for better accessibility
+   */
+  setupFocusTrap() {
+    if (!this.drawer) return;
+    
+    // Remove any existing keydown listener to avoid duplicates
+    this.drawer.removeEventListener('keydown', this.handleTabKey);
+    
+    // Set up new listener for tab key navigation
+    this.handleTabKey = (e) => {
+      if (e.key !== 'Tab') return;
+      
+      const focusableElements = this.drawer.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      
+      if (focusableElements.length === 0) return;
+      
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      
+      if (e.shiftKey) { // Shift + Tab
+        if (document.activeElement === firstElement) {
+          lastElement.focus();
+          e.preventDefault();
+        }
+      } else { // Just Tab
+        if (document.activeElement === lastElement) {
+          firstElement.focus();
+          e.preventDefault();
+        }
+      }
+    };
+    
+    this.drawer.addEventListener('keydown', this.handleTabKey);
   }
 }
 

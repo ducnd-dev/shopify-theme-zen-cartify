@@ -260,9 +260,8 @@
               <div class="product-card group">
                 <a href="{{ product.url }}" class="block">
                   <!-- Product Image -->
-                  <div class="product-card__image-wrapper relative rounded-lg overflow-hidden bg-gray-100 mb-4">                    {% if product.featured_image != blank %}
-                      <img
-                        src="{{ product.featured_image | image_url: width: 500 }}"
+                  <div class="product-card__image-wrapper relative rounded-lg overflow-hidden bg-gray-100 mb-4">                    {% if product.featured_image != blank %}                      <img
+                        src="{{ product.featured_image | img_url: '500x500' }}"
                         alt="{{ product.featured_image.alt | default: product.title | escape }}"
                         class="product-card__image transform group-hover:scale-105 transition-transform duration-300"
                         width="500"

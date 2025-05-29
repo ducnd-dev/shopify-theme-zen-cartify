@@ -19,13 +19,13 @@
               <a href="{{ block.settings.link }}" class="block" target="{{ block.settings.open_new_tab | default: false | replace: true, '_blank' | replace: false, '_self' }}" aria-label="{{ block.settings.name | escape }}">
             {% endif %}
             
-            {% if block.settings.logo != blank %}
-              <img
-                src="{{ block.settings.logo | image_url: width: 150 }}"
+            {% if block.settings.logo != blank %}              <img
+                src="{{ block.settings.logo | img_url: '150x' }}"
                 alt="{{ block.settings.name | escape }}"
                 class="max-h-16 w-auto mx-auto opacity-80 hover:opacity-100 transition-opacity"
                 width="150"
                 loading="lazy"
+                height="50"
               >
             {% else %}
               <div class="h-16 flex items-center justify-center">

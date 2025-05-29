@@ -17,10 +17,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Favicon -->
+    <!-- Favicon -->
   {% if settings.favicon != blank %}
-    <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32 }}">
+    <link rel="icon" type="image/png" href="{{ settings.favicon | img_url: '32x32' }}">
   {% endif %}
   
   <!-- Tailwind CSS -->
@@ -46,11 +45,12 @@
   </script>
     <!-- Custom CSS -->
   {{ 'theme.css' | asset_url | stylesheet_tag }}
-  {{ 'product-card.css' | asset_url | stylesheet_tag }}
-  <!-- JavaScript -->
+  {{ 'product-card.css' | asset_url | stylesheet_tag }}  <!-- JavaScript -->
   <script src="{{ 'theme.js' | asset_url }}" defer></script>
   <script src="{{ 'accessibility-improvements.js' | asset_url }}" defer></script>
   <script src="{{ 'cart-drawer.js' | asset_url }}" defer></script>
+  <script src="{{ 'product-form.js' | asset_url }}" defer></script>
+  <script src="{{ 'header-navigation.js' | asset_url }}" defer></script>
   <script src="{{ 'cart-drawer.js' | asset_url }}" defer></script>
   
   <!-- Theme settings -->

@@ -18,10 +18,9 @@
     <!-- Our Story -->
     <div class="about__story mb-16">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-        <div class="about__image rounded-lg overflow-hidden">
-          {% if section.settings.story_image != blank %}
+        <div class="about__image rounded-lg overflow-hidden">          {% if section.settings.story_image != blank %}
             <img 
-              src="{{ section.settings.story_image | image_url: width: 800 }}" 
+              src="{{ section.settings.story_image | img_url: '800x' }}" 
               alt="{{ section.settings.story_title | default: 'Our Story' }}"
               class="w-full h-auto"
               width="800"
@@ -36,8 +35,7 @@
             </div>
           {% endif %}
         </div>
-        
-        <div class="about__text">
+          <div class="about__text">
           <h2 class="text-2xl font-bold mb-4">{{ section.settings.story_title | default: 'Our Story' }}</h2>
           
           <div class="text-gray-600 space-y-4">
@@ -57,10 +55,9 @@
           </div>
           
           {% if section.settings.story_signature != blank %}
-            <div class="mt-6">
-              <img 
-                src="{{ section.settings.story_signature | image_url: width: 200 }}" 
-                alt="Founder's Signature" 
+            <div class="mt-6">              <img 
+                src="{{ section.settings.story_signature | img_url: '200x' }}" 
+                alt="Founder{% if true %}'{% endif %}s Signature" 
                 class="h-16 w-auto"
                 width="200"
                 height="50"
@@ -74,7 +71,7 @@
     
     <!-- Mission & Values -->
     <div class="mission mb-16">
-      <h2 class="text-2xl font-bold mb-8 text-center">{{ section.settings.values_title | default: 'Our Mission & Values' }}</h2>
+      <h2 class="text-2xl font-bold mb-8 text-center">{{ section.settings.values_title | default: "Our Mission & Values" }}</h2>
       
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         {% for block in section.blocks %}
@@ -162,9 +159,8 @@
           {% if block.type == 'team_member' %}
             <div class="team__member text-center">
               <div class="team__avatar mb-4 rounded-full overflow-hidden w-40 h-40 mx-auto">
-                {% if block.settings.image != blank %}
-                  <img 
-                    src="{{ block.settings.image | image_url: width: 160 }}" 
+                {% if block.settings.image != blank %}                  <img 
+                    src="{{ block.settings.image | img_url: '160x160', crop: 'center' }}" 
                     alt="{{ block.settings.name }}" 
                     class="w-full h-full object-cover"
                     width="160"

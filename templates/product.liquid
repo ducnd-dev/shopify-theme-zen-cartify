@@ -9,9 +9,8 @@
       <!-- Product Gallery -->
       <div class="gallery">
         {% if product.images.size > 0 %}
-          <div class="gallery__main-image mb-4">
-            <img 
-              src="{{ product.featured_image | image_url: width: 800 }}" 
+          <div class="gallery__main-image mb-4">            <img 
+              src="{{ product.featured_image | img_url: '800x800' }}" 
               alt="{{ product.featured_image.alt | default: product.title | escape }}"
               id="ProductFeaturedImage"
               class="w-full h-auto rounded-lg"
@@ -26,13 +25,11 @@
               {% for image in product.images %}
                 <button 
                   type="button"
-                  class="gallery__thumbnail-btn w-full rounded-lg overflow-hidden border-2 {% if forloop.index0 == 0 %}border-primary{% else %}border-transparent{% endif %} hover:border-primary focus:border-primary transition-colors"
-                  data-image-id="{{ image.id }}"
-                  data-image-url="{{ image | image_url: width: 800 }}"
+                  class="gallery__thumbnail-btn w-full rounded-lg overflow-hidden border-2 {% if forloop.index0 == 0 %}border-primary{% else %}border-transparent{% endif %} hover:border-primary focus:border-primary transition-colors"                  data-image-id="{{ image.id }}"
+                  data-image-url="{{ image | img_url: '800x800' }}"
                   aria-label="Change image to {{ forloop.index }}"
-                >
-                  <img 
-                    src="{{ image | image_url: width: 150 }}" 
+                >                  <img 
+                    src="{{ image | img_url: '150x150' }}" 
                     alt="{{ image.alt | default: product.title | escape }}"
                     class="w-full h-auto"
                     width="150"
@@ -158,14 +155,13 @@
           <!-- Quantity and Add to Cart -->
           <div class="flex flex-col sm:flex-row gap-4 mb-6">
             <!-- Quantity Selector -->            <div class="product-info__quantity w-full sm:w-1/3">
-              <label for="Quantity" class="block text-sm font-medium mb-2">Quantity</label>
+              <label for="Quantity" id="quantity-label" class="block text-sm font-medium mb-2">Quantity</label>
               <div class="flex border border-gray-300 rounded-lg overflow-hidden" role="group" aria-labelledby="quantity-label">
                 <button 
                   type="button"
-                  class="product-info__quantity-btn flex-none w-10 h-10 flex items-center justify-center border-r border-gray-300 hover:bg-gray-100"
+                  class="product-info__quantity-btn flex-none w-10 h-10 flex items-center justify-center border-r border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset"
                   aria-label="Decrease quantity"
                   data-action="decrement"
-                  tabindex="0"
                 >
                   <span aria-hidden="true">-</span>
                 </button>
@@ -176,28 +172,25 @@
                   value="1"
                   min="1"
                   aria-labelledby="quantity-label"
-                  class="flex-grow w-full text-center border-0 focus:ring-0"
+                  class="flex-grow w-full text-center border-0 focus:ring-0 focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                 <button 
                   type="button"
-                  class="product-info__quantity-btn flex-none w-10 h-10 flex items-center justify-center border-l border-gray-300 hover:bg-gray-100"
+                  class="product-info__quantity-btn flex-none w-10 h-10 flex items-center justify-center border-l border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset"
                   aria-label="Increase quantity"
                   data-action="increment"
-                  tabindex="0"
                 >
                   <span aria-hidden="true">+</span>
                 </button>
               </div>
-              <span id="quantity-label" class="sr-only">Product quantity</span>
-            </div><!-- Add to Cart Button -->
-            <div class="product-info__add w-full sm:w-2/3">
-              <label class="block text-sm font-medium invisible mb-2">Add to Cart</label>
+            </div><!-- Add to Cart Button -->            <div class="product-info__add w-full sm:w-2/3">
+              <div class="block text-sm font-medium invisible mb-2" aria-hidden="true">Add to Cart</div>
               <button
                 type="submit"
-                class="product-info__add-btn js-add-to-cart w-full h-10 bg-primary hover:bg-primary-dark text-white font-medium rounded-lg transition-colors flex items-center justify-center {% if product.available == false %}opacity-50 cursor-not-allowed{% endif %}"
+                class="product-info__add-btn js-add-to-cart w-full h-10 bg-primary hover:bg-primary-dark text-white font-medium rounded-lg transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary {% if product.available == false %}opacity-50 cursor-not-allowed{% endif %}"
                 {% if product.available == false %}disabled{% endif %}
                 data-product-id="{{ product.id }}"
-                aria-label="Add {{ product.title }} to cart"
+                aria-label="{% if product.available %}Add {{ product.title | escape }} to cart{% else %}{{ product.title | escape }} is sold out{% endif %}"
               >
                 {% if product.available %}
                   <span class="mr-2">
@@ -479,9 +472,8 @@
               <a href="{{ product.url }}" class="block">
                 <!-- Product Image -->
                 <div class="product-card__image relative rounded-lg overflow-hidden bg-gray-100 mb-4 aspect-w-1 aspect-h-1">
-                  {% if product.featured_image != blank %}
-                    <img
-                      src="{{ product.featured_image | image_url: width: 500 }}"
+                  {% if product.featured_image != blank %}                    <img
+                      src="{{ product.featured_image | img_url: '500x500' }}"
                       alt="{{ product.featured_image.alt | default: product.title | escape }}"
                       class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
                       width="500"

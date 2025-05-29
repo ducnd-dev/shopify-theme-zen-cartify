@@ -40,9 +40,8 @@
             
             <div class="testimonial-card__author flex items-center">
               {% if block.settings.author_image != blank %}
-                <div class="testimonial-card__author-image mr-3">
-                  <img 
-                    src="{{ block.settings.author_image | image_url: width: 60 }}" 
+                <div class="testimonial-card__author-image mr-3">                  <img 
+                    src="{{ block.settings.author_image | img_url: '60x60', crop: 'center' }}" 
                     alt="{{ block.settings.author_name | escape }}"
                     class="w-10 h-10 rounded-full object-cover"
                     width="40"

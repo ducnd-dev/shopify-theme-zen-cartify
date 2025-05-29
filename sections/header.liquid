@@ -9,9 +9,8 @@
       <!-- Logo -->
       <div class="navbar__logo">
         <a href="/" class="flex items-center">
-          {% if section.settings.logo != blank %}
-            <img 
-              src="{{ section.settings.logo | image_url: width: 150 }}" 
+          {% if section.settings.logo != blank %}            <img 
+              src="{{ section.settings.logo | img_url: '150x' }}" 
               alt="{{ shop.name }}"
               class="h-8 w-auto"
               width="150" 
@@ -37,49 +36,51 @@
       </nav>
       
       <!-- Icons: Search, Account, Cart -->
-      <div class="navbar__actions flex items-center space-x-4">
-        <!-- Search -->
+      <div class="navbar__actions flex items-center space-x-4">        <!-- Search -->
         <button 
           type="button"
           aria-label="Search"
-          class="navbar__search-btn p-2 hover:bg-gray-100 rounded-full transition-colors"
-          onclick="document.getElementById('searchModal').classList.remove('hidden')"
+          aria-controls="searchModal"
+          aria-expanded="false"
+          class="navbar__search-btn js-search-toggle p-2 hover:bg-gray-100 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+          id="searchToggle"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
           </svg>
         </button>
-        
-        <!-- Account -->
+          <!-- Account -->
         <a 
           href="{{ routes.account_url }}"
-          aria-label="Account"
-          class="navbar__account-btn p-2 hover:bg-gray-100 rounded-full transition-colors"
+          aria-label="{% if customer %}Your account{% else %}Sign in{% endif %}"
+          class="navbar__account-btn p-2 hover:bg-gray-100 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
           </svg>
-        </a>
-          <!-- Cart -->
+        </a><!-- Cart -->
         <button 
           type="button"
-          aria-label="Cart"
-          class="navbar__cart-btn js-cart-toggle p-2 hover:bg-gray-100 rounded-full transition-colors relative"
+          aria-label="Cart ({{ cart.item_count }} items)"
+          aria-controls="cartDrawer"
+          aria-expanded="false"
+          class="navbar__cart-btn js-cart-toggle p-2 hover:bg-gray-100 rounded-full transition-colors relative focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+          id="cartToggle"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
           </svg>
-          <span class="cart-count js-cart-count absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+          <span class="cart-count js-cart-count absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-4 w-4 flex items-center justify-center {% if cart.item_count == 0 %}hidden{% endif %}">
             {{ cart.item_count }}
           </span>
         </button>
-        
-        <!-- Mobile Menu Toggle -->
+          <!-- Mobile Menu Toggle -->
         <button 
           type="button"
           aria-label="Menu"
-          class="navbar__mobile-toggle md:hidden p-2 hover:bg-gray-100 rounded-full transition-colors"
-          onclick="document.getElementById('mobileMenu').classList.toggle('hidden')"
+          aria-expanded="false"
+          aria-controls="mobileMenu"
+          class="navbar__mobile-toggle js-menu-toggle md:hidden p-2 hover:bg-gray-100 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
@@ -87,14 +88,14 @@
         </button>
       </div>
     </div>
-    
-    <!-- Mobile Menu (hidden by default) -->
-    <div id="mobileMenu" class="navbar__mobile-menu hidden mt-4 pb-4">
+      <!-- Mobile Menu (hidden by default) -->
+    <div id="mobileMenu" class="navbar__mobile-menu hidden mt-4 pb-4" aria-hidden="true" aria-labelledby="mobileMenuLabel">
+      <div id="mobileMenuLabel" class="sr-only">Mobile navigation menu</div>
       <nav class="flex flex-col space-y-3">
         {% for link in section.settings.menu.links %}
           <a 
             href="{{ link.url }}" 
-            class="navbar__link text-sm font-medium py-2 px-4 hover:bg-gray-50 rounded-lg {% if link.active %}text-primary font-semibold{% endif %}"
+            class="navbar__link text-sm font-medium py-2 px-4 hover:bg-gray-50 rounded-lg focus:outline-none focus:bg-gray-100 focus:text-primary {% if link.active %}text-primary font-semibold{% endif %}"
           >
             {{ link.title }}
           </a>
@@ -105,23 +106,22 @@
 </div>
 
 <!-- Search Modal (hidden by default) -->
-<div id="searchModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+<div id="searchModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden" role="dialog" aria-modal="true" aria-labelledby="searchModalTitle">
   <div class="bg-white rounded-lg w-full max-w-md mx-4 p-4">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-lg font-semibold">Search</h2>
+      <h2 id="searchModalTitle" class="text-lg font-semibold">Search</h2>
       <button
         type="button"
-        aria-label="Close"
-        class="p-2 hover:bg-gray-100 rounded-full"
-        onclick="document.getElementById('searchModal').classList.add('hidden')"
+        aria-label="Close search"
+        class="p-2 hover:bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-primary js-search-close"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
         </svg>
       </button>
-    </div>
-    <form action="{{ routes.search_url }}" method="get" role="search">
+    </div>    <form action="{{ routes.search_url }}" method="get" role="search">
       <div class="relative">
+        <label for="searchInput" class="sr-only">Search products</label>
         <input
           type="text"
           name="q"
@@ -129,12 +129,14 @@
           placeholder="Search products..."
           class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
           autocomplete="off"
+          aria-label="Search products"
         >
         <button
           type="submit"
-          class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary"
+          aria-label="Submit search"
+          class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary focus:outline-none focus:text-primary"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
           </svg>
         </button>
